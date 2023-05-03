@@ -9,10 +9,32 @@ from codes import country_codes
 from country_surface_area import country_areas
 from country_latitudes import latitudes
 sns.set_theme()
-st.set_page_config(layout="wide")
+st.set_page_config(layout='wide', initial_sidebar_state='expanded')
+st.write('<style>div.block-container{padding-top:2rem;}</style>', unsafe_allow_html=True)
+with open('style.css') as f:
+    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
+def graph_title(col):
+    match col:
+        case 'Production':
+            return f'{col} - Total 60kg bags in thousands'
+        case 'Domestic Consumption':
+            return f'{col} - Total 60kg bags in thousands'
+        case 'Gross Openings':
+            return f'{col} - Total 60kg bags in thousands'
+        case 'Exports':
+            return f'{col} - Total 60kg bags in thousands'
+        case 'Imports':
+            return f'{col} - Total 60kg bags in thousands'
+        case 'Production Over Area':
+            return f'{col} - Total Production(K 60kg bags) over area in sq km2'
+        case 'Dom. Consumption Ratio':
+            return f'{col} - Domestic Consumption(K 60kg bags) over total production'
+        case _:
+            return f'{col} - Total'
 
 # Define a function to plot the choroplets
-def world_plot2(df,column,color_scale):
+def prod_plot(df,column,color_scale):
     fig = px.choropleth(
         df,
         locations='Code',
@@ -26,17 +48,52 @@ def world_plot2(df,column,color_scale):
 
     # Update the layout of the figure
     fig.update_layout(
-        title='Totals by Country',
+        title=graph_title(column),
         margin={'r': 0, 't': 40, 'l': 0, 'b': 10},
     )
 
     # Show the figure
     return fig
-    #fig.show()
 
-# Create a title for the streamlit dashboard
-st.title('Coffee around the world')
-#data_load_state = st.text('Loading data...')
+def imports_plot(color_scale):
+    fig = px.choropleth(
+        df_imports,
+        locations='Code',
+        color='Totals',
+        hover_name='Country',
+        
+        color_continuous_scale=color_scale,
+        #range_color=(0, 1500000),
+        scope='world',
+    )
+
+    # Update the layout of the figure
+    fig.update_layout(
+        title=graph_title('Totals'),
+        margin={'r': 0, 't': 40, 'l': 0, 'b': 10},
+    )
+
+    # Show the figure
+    return fig
+
+def create_world_plot(chart_option):
+    match chart_option:
+        case 'Production':
+            return prod_plot(df_totals,chart_option,'Greens')
+        case 'Domestic Consumption':
+            return prod_plot(df_totals,chart_option,'Reds')
+        case 'Gross Openings':
+            return prod_plot(df_totals,chart_option,'Purples')
+        case 'Exports':
+            return prod_plot(df_totals,chart_option,'Blues')
+        case 'Imports':
+            return imports_plot('Oranges')
+        case 'Production Over Area':
+            return prod_plot(df_totals,chart_option,'Greens')
+        case 'Dom. Consumption Ratio':
+            return prod_plot(df_totals,chart_option,'Reds')
+        case _:
+            return prod_plot(df_totals,chart_option,'Greens')
 
 #Import excel files after initial row cleaning
 #@st.cache_data
@@ -72,25 +129,26 @@ df_totals = pd.concat([df_production[['Country','Code','Continent','Totals']],df
 df_totals.columns=['Country','Code','Continent','Production','Domestic Consumption','Exports','Gross Openings']
 df_totals['Imports Offset'] = -df_totals['Production'] + df_totals['Domestic Consumption'] + df_totals['Exports'] + df_totals['Gross Openings']
 df_totals['Exports Ratio'] = df_totals['Exports']/df_totals['Production']
-df_totals['Domestic Consump Ratio'] = df_totals['Domestic Consumption']/df_totals['Production']
+df_totals['Dom. Consumption Ratio'] = df_totals['Domestic Consumption']/df_totals['Production']
 df_totals['Area'] = df_totals['Country'].map(country_areas)
-df_totals['Production/Area1000'] = 1000*df_totals['Production']/df_totals['Area']
+df_totals['Production Over Area'] = 1000*df_totals['Production']/df_totals['Area']
 df_totals['Latitude']=df_totals['Country'].map(latitudes)
 # Update data loading
 #data_load_state.text('Loading data...done!')
 
+
+
+# Create a sidebar for the streamlit dashboard
+st.sidebar.header('☕Coffee around the world☕')
 # Select one of the charts to print
-chart_option = st.selectbox(
-    'Please select one of the charts below:',('Production','Domestic Consumption','Gross Openings','Exports','Imports'))
-prod_fig=world_plot2(df_totals,chart_option,px.colors.sequential.Reds)
-st.plotly_chart(prod_fig,use_container_width=True)
-# Create a dictionary that maps each pf the previous options with a dataframe
-options = {'Production':df_production,'Domestic Consumption':df_consumption,'Gross Openings':df_openings,'Exports':df_exports,'Imports':df_imports}
+chart_option = st.sidebar.selectbox(
+    'Please select one of the charts below:',('Production','Production Over Area','Domestic Consumption','Dom. Consumption Ratio','Gross Openings','Exports','Imports'))
+my_fig=create_world_plot(chart_option)
+st.plotly_chart(my_fig,use_container_width=True)
 # Map one dataframe to the streamlit dashboard
-st.subheader('Check the data here:')
-with st.expander('Exporting countries consolidateddata'):
-    st.dataframe(df_totals.style.highlight_max(axis=0,subset=['Production','Domestic Consumption','Exports','Openings','Offset','Exports Ratio',
-                                                          'Domestic Consump Ratio','Production/Area1000']))
+st.markdown('Check the data here:')
+with st.expander('Exporting countries consolidated data'):
+    st.dataframe(df_totals.style.highlight_max(axis=0))
 with st.expander('Importing countries data'):
     st.dataframe(df_imports.style.highlight_max(axis=0))
 
