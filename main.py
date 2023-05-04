@@ -9,7 +9,7 @@ from codes import country_codes
 from country_surface_area import country_areas
 from country_latitudes import latitudes
 sns.set_theme()
-st.set_page_config(layout='wide', initial_sidebar_state='expanded')
+st.set_page_config(layout='wide', initial_sidebar_state='expanded',page_title='☕Coffee around the world☕')
 st.write('<style>div.block-container{padding-top:2rem;}</style>', unsafe_allow_html=True)
 with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
@@ -61,18 +61,15 @@ def imports_plot(color_scale):
         locations='Code',
         color='Totals',
         hover_name='Country',
-        
         color_continuous_scale=color_scale,
         #range_color=(0, 1500000),
         scope='world',
     )
-
     # Update the layout of the figure
     fig.update_layout(
-        title=graph_title('Totals'),
-        margin={'r': 0, 't': 40, 'l': 0, 'b': 10},
+        title=graph_title('Imports'),
+        margin={'r': 0, 't': 20, 'l': 0, 'b': 0},
     )
-
     # Show the figure
     return fig
 
@@ -94,6 +91,8 @@ def create_world_plot(chart_option):
             return prod_plot(df_totals,chart_option,'Reds')
         case _:
             return prod_plot(df_totals,chart_option,'Greens')
+                
+######################################################################################################
 
 #Import excel files after initial row cleaning
 #@st.cache_data
@@ -144,8 +143,10 @@ st.sidebar.header('☕Coffee around the world☕')
 chart_option = st.sidebar.selectbox(
     'Please select one of the charts below:',('Production','Production Over Area','Domestic Consumption','Dom. Consumption Ratio','Gross Openings','Exports','Imports'))
 my_fig=create_world_plot(chart_option)
-st.plotly_chart(my_fig,use_container_width=True)
-# Map one dataframe to the streamlit dashboard
+#Create columns of the dashboard
+col1,col2 = st.columns([4,1])
+col1.plotly_chart(my_fig,use_container_width=True)
+#col2.top10_chart(chart_option)
 st.markdown('Check the data here:')
 with st.expander('Exporting countries consolidated data'):
     st.dataframe(df_totals.style.highlight_max(axis=0))
