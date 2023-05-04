@@ -9,7 +9,7 @@ from codes import country_codes
 from country_surface_area import country_areas
 from country_latitudes import latitudes
 st.set_page_config(layout='wide', initial_sidebar_state='expanded',page_title='☕Coffee around the world☕')
-st.write('<style>div.block-container{padding-top:2rem;}</style>', unsafe_allow_html=True)
+st.write('<style>div.block-container{padding-top:1rem;gap:0rem}</style>', unsafe_allow_html=True)
 with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
@@ -97,6 +97,20 @@ def top10s(column):
         top10 = df_totals[['Country','Code',column]].sort_values(by=column, ascending=False).head(10)
         top10 = top10.sort_values(by=column, ascending=True)
         return top10
+    
+def lineplot_production(country):
+    '''Create a line plot of imports for a given country code'''
+    country_prod = df_production[df_production['Country'] == country].iloc[:,2:-3]
+    country_prod=country_prod.T
+    country_prod.rename(columns={country_prod.columns[0]:f'{country} Production in thousands 60kg bags'},inplace=True)
+    country_prod['Dom. consumption in thousands 60kg bags']= df_consumption[df_consumption['Country'] == country].iloc[:,2:-3].T
+    st.line_chart(data=country_prod,height=300,use_container_width=True)
+
+def lineplot_imports(country):
+    '''Create a line plot of imports for a given country code'''
+    country_imports = df_imports[df_imports['Country'] == country].iloc[:,1:-5].T
+    country_imports.rename(columns={country_imports.columns[0]:f'{country} Imports in thousands 60kg bags'},inplace=True)
+    st.line_chart(data=country_imports,height=300,use_container_width=True)
 
             
 ######################################################################################################
@@ -146,6 +160,7 @@ df_totals['Latitude']=df_totals['Country'].map(latitudes)
 
 # Create a sidebar for the streamlit dashboard
 st.sidebar.header('☕Coffee around the world☕')
+st.sidebar.write('Data analysis of coffee production and comsumption, and it\'s impact into this regions. Datasets downloaded from https://www.ico.org/new_historical.asp.')
 # Select one of the charts to print
 chart_option = st.sidebar.selectbox(
     'Please select one of the charts below:',('Production','Production Over Area','Domestic Consumption','Dom. Consumption Ratio','Gross Openings','Exports','Imports'))
@@ -166,7 +181,9 @@ top10_chart=top10s(chart_option)
 col2.plotly_chart(go.Figure(go.Bar(y=top10_chart['Country'],x=top10_chart[chart_option],orientation='h')).update_layout(title=graph_title('Top 10 countries'),margin={'t':30}),
                   use_container_width=True)
 # Creates a lineplot depending on the option selected
-
+if chart_option == 'Imports': lineplot_imports(line_option)
+else: lineplot_production(line_option)
+    
 
 # Shows the data summarized
 st.markdown('Check the data here:')
