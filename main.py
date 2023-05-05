@@ -160,7 +160,7 @@ df_totals['Latitude']=df_totals['Country'].map(latitudes)
 
 # Create a sidebar for the streamlit dashboard
 st.sidebar.header('☕Coffee around the world☕')
-st.sidebar.write('Data analysis of coffee production and comsumption, and it\'s impact into this regions. Datasets downloaded from https://www.ico.org/new_historical.asp.')
+st.sidebar.write('Data analysis of coffee production and consumption, and its impact on these regions. Datasets downloaded from https://www.ico.org/new_historical.asp.')
 # Select one of the charts to print
 chart_option = st.sidebar.selectbox(
     'Please select one of the charts below:',('Production','Production Over Area','Domestic Consumption','Dom. Consumption Ratio','Gross Openings','Exports','Imports'))
