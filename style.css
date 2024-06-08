@@ -32,7 +32,13 @@ label.css-mkogse.e16fv1kl2 {
 
 /* Adjust block container */
 div.block-container.css-18e3th9.egzxvld2 {
-  margin-top: 10; /* Adjust or remove the negative margin */
+  margin-top: 0; /* Adjust or remove the negative margin */
+  padding-top: 2em; /* Add padding to the top to ensure titles are visible */
+}
+
+/* Additional styles to ensure chart titles are visible */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1em; /* Add margin to top of headings */
 }
 
 /* Hide hamburger menu and footer */
