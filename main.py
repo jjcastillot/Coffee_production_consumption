@@ -134,4 +134,35 @@ df_openings['Continent'] = df_openings['Country'].map(countries)
 # Exports in thousands 60kg bags
 df_exports = pd.read_excel('datasets/1e - Exports - crop year.xlsx', skiprows=3, skipfooter=3)
 df_exports['Country'] = df_exports['Country'].str.lstrip()
-df_exports['Code']
+df_exports['Code'] = df_exports['Country'].map(country_codes)
+df_exports['Continent'] = df_exports['Country'].map(countries)
+# Imports in thousands 60kg bags
+df_imports = pd.read_excel('datasets/2b - Imports.xlsx', skiprows=3, skipfooter=3)
+df_imports['Country'] = df_imports['Country'].str.lstrip()
+df_imports['Code'] = df_imports['Country'].map(country_codes)
+df_imports['Continent'] = df_imports['Country'].map(countries)
+df_imports['Area'] = df_imports['Country'].map(country_areas)
+df_imports['Latitude'] = df_imports['Country'].map(latitudes)
+
+# Create a dataframe with the 'Totals' columns from these 4 dataframes: df_production, df_consumption, df_openings, and df_exports. Create exports to production ratio
+df_totals = pd.concat([df_production[['Country', 'Code', 'Continent', 'Totals']], df_consumption['Totals'], df_exports['Totals'], df_openings['Totals']], axis=1)
+df_totals.columns = ['Country', 'Code', 'Continent', 'Production', 'Domestic Consumption', 'Exports', 'Gross Openings']
+df_totals['Imports Offset'] = -df_totals['Production'] + df_totals['Domestic Consumption'] + df_totals['Exports'] + df_totals['Gross Openings']
+df_totals['Exports Ratio'] = df_totals['Exports'] / df_totals['Production']
+df_totals['Dom. Consumption Ratio'] = df_totals['Domestic Consumption'] / df_totals['Production']
+df_totals['Area'] = df_totals['Country'].map(country_areas)
+df_totals['Production Over Area'] = 1000 * df_totals['Production'] / df_totals['Area']
+df_totals['Latitude'] = df_totals['Country'].map(latitudes)
+
+# Update data loading
+# data_load_state.text('Loading data...done!')
+
+######################################################################################
+
+# Create a sidebar for the streamlit dashboard
+st.sidebar.header('☕Coffee around the world☕')
+st.sidebar.write('Data analysis of coffee production and consumption, and its impact on these regions. Datasets downloaded from https://www.ico.org/new_historical.asp.')
+
+# Select one of the charts to print
+chart_option = st.sidebar.selectbox(
+    'Please select one of the charts below:', ('Production', 'Production Over Area', 'Domestic Consumption
