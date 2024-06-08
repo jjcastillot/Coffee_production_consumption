@@ -187,9 +187,9 @@ else: lineplot_production(line_option)
 
 # Shows the data summarized
 st.markdown('Check the data here:')
-with st.expander('Exporting countries consolidated data'):
+with st.expander('Coffee exporting countries consolidated data'):
     st.dataframe(df_totals.style.highlight_max(axis=0))
-with st.expander('Importing countries data'):
+    with st.expander('Coffee importing countries data'):
     st.dataframe(df_imports.style.highlight_max(axis=0))
 
 
