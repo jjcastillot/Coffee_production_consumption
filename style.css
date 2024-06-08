@@ -31,10 +31,7 @@ label.css-mkogse.e16fv1kl2 {
 }
 
 /* Adjust block container */
-div.block-container {
-  padding-top: 1rem;
-  gap: 0rem;
-  margin-top: 0; /* Ensure no negative margin */
+div.block-container.css-18e3th9.egzxvld2 {
   padding-top: 2em; /* Add padding to the top to ensure titles are visible */
 }
 
