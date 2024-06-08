@@ -1,5 +1,5 @@
 * {
-  margin: 10;
+  margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
@@ -31,8 +31,10 @@ label.css-mkogse.e16fv1kl2 {
 }
 
 /* Adjust block container */
-div.block-container.css-18e3th9.egzxvld2 {
-  margin-top: 0; /* Adjust or remove the negative margin */
+div.block-container {
+  padding-top: 1rem;
+  gap: 0rem;
+  margin-top: 0; /* Ensure no negative margin */
   padding-top: 2em; /* Add padding to the top to ensure titles are visible */
 }
 
